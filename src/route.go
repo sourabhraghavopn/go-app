@@ -10,39 +10,47 @@ import (
 
 func (app *App) route() *httprouter.Router {
 	router := httprouter.New()
-	service := &Service{repo:UrlRepo{conn:app.loadConnection(),logger:app.logger, },}
+	service := &Service{repo: UrlRepo{conn: app.loadConnection(), logger: app.logger}}
 
 	router.HandlerFunc(http.MethodPost, "/create", func(w http.ResponseWriter, r *http.Request) {
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {http.Error(w, "Error reading request body", http.StatusInternalServerError)}
-
-		request :=CreateShortUrlRequest{}
-		json.Unmarshal([]byte(body), &request)
-
-		response, err := json.Marshal(service.createShortUrl(request))
-		if err != nil {http.Error(w, "Error reading response body", http.StatusInternalServerError)}
-
-		respondSuccess(w,string(response))
+		request:=extractCreateRequest(w,r)
+		sendResponse(w, service.createShortUrl(request))
 	})
 	router.HandlerFunc(http.MethodGet, "/get", func(w http.ResponseWriter, r *http.Request) {
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {http.Error(w, "Error reading request body", http.StatusInternalServerError)}
-
-		request :=GetOriginalUrlRequest{}
-		json.Unmarshal([]byte(body), &request)
-
-		response, err := json.Marshal(service.getFullUrl(request))
-		fmt.Println(string(response))
-		if err != nil {http.Error(w, "Error reading response body", http.StatusInternalServerError)}
-
-		respondSuccess(w,string(response))
+		request:=extractGetRequest(w,r)
+		sendResponse(w, service.getFullUrl(request))
 	})
 	return router
 }
 
+func extractCreateRequest(w http.ResponseWriter, r *http.Request) CreateShortUrlRequest {
+	request := CreateShortUrlRequest{}
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Error reading request body", http.StatusInternalServerError)
+	}
+	fmt.Println("Request : ",string(body))
+	json.Unmarshal([]byte(body), &request)
+	return request
+}
 
-func respondSuccess(w http.ResponseWriter, input string) {
+func extractGetRequest(w http.ResponseWriter, r *http.Request) GetOriginalUrlRequest {
+	request := GetOriginalUrlRequest{}
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Error reading request body", http.StatusInternalServerError)
+	}
+	fmt.Println("Request : ",string(body))
+	json.Unmarshal([]byte(body), &request)
+	return request
+}
+
+func sendResponse(w http.ResponseWriter, response interface{}) {
+	responseString, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, "Error reading response body", http.StatusInternalServerError)
+	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(input))
+	w.Write([]byte(responseString))
 }

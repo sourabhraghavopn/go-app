@@ -24,6 +24,7 @@ type UrlRepo struct {
 	logger *log.Logger
 	conn   Conn
 }
+
 type CreateShortUrlRequest struct {
 	OriginalUrl string `json:"original_url"`
 }
