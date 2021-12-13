@@ -1,11 +1,8 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
-	"strconv"
-	"strings"
 )
 
 func (service Service) createShortUrl(request CreateShortUrlRequest) CreateShortUrlResponse {
@@ -33,15 +30,4 @@ func (service Service) getFullUrl(request GetOriginalUrlRequest) GetOriginalUrlR
 		fmt.Println("No error found ")
 		return GetOriginalUrlResponse{url.OriginalUrl, "success"}
 	}
-}
-func extractId(url string) (int, error) {
-	list := strings.Split(url, "/")
-	if len(list) > 3 {
-		id, err := strconv.Atoi(list[3])
-		if err!=nil {
-			return 0,nil
-		}
-		return id, nil
-	}
-	return 0, errors.New("incorrect url")
 }

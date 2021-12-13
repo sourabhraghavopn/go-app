@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"io/ioutil"
 	"net/http"
@@ -29,7 +28,6 @@ func extractCreateRequest(w http.ResponseWriter, r *http.Request) CreateShortUrl
 	if err != nil {
 		http.Error(w, "Error reading request body", http.StatusInternalServerError)
 	}
-	fmt.Println("Request : ",string(body))
 	json.Unmarshal([]byte(body), &request)
 	return request
 }
@@ -40,7 +38,6 @@ func extractGetRequest(w http.ResponseWriter, r *http.Request) GetOriginalUrlReq
 	if err != nil {
 		http.Error(w, "Error reading request body", http.StatusInternalServerError)
 	}
-	fmt.Println("Request : ",string(body))
 	json.Unmarshal([]byte(body), &request)
 	return request
 }
