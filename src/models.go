@@ -20,9 +20,15 @@ type Conn struct {
 	db  *bun.DB
 	ctx context.Context
 }
-type UrlRepo struct {
+type UrlRepoImpl struct {
 	logger *log.Logger
 	conn   Conn
+}
+
+type UrlRepo interface {
+	getLatestSequence() int
+	insert(url UrlDetail) bool
+	get(shortUrlId int) (UrlDetail, error)
 }
 
 type CreateShortUrlRequest struct {

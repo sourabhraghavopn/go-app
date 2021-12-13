@@ -11,8 +11,8 @@ import (
 
 
 
-func  (app App) loadEnv() string {
-	err := env.Load("resources/.env")
+func  (app App) loadEnv(path string) string {
+	err := env.Load(path)
 	if err != nil {
 		app.logger.Fatal(err)
 	}
@@ -29,12 +29,16 @@ func  (app App) loadEnv() string {
 
 func  main() {
 	fmt.Println("Running")
+	logger:=log.New(os.Stdout,"",log.Ldate|log.Llongfile)
 	app:=&App{
-		logger:log.New(os.Stdout,"",log.Ldate|log.Llongfile),
+		logger:logger,
 	}
+	address:=app.loadEnv("resources/.env-dev")
 	serve:=&http.Server{
-		Addr:app.loadEnv(),
-		Handler:app.route(),
+		Addr:address,
+		Handler:app.route(UrlRepoImpl{
+			conn: app.loadConnection(),
+			logger: logger}),
 		ReadTimeout: 10*time.Second,
 		WriteTimeout: 30*time.Second,
 	}

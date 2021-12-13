@@ -2,21 +2,22 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"io/ioutil"
 	"net/http"
 )
 
-func (app *App) route() *httprouter.Router {
+func (app *App) route(repo UrlRepo) *httprouter.Router {
 	router := httprouter.New()
-	service := &Service{repo: UrlRepo{conn: app.loadConnection(), logger: app.logger}}
+	service := &Service{repo: repo}
 
 	router.HandlerFunc(http.MethodPost, "/create", func(w http.ResponseWriter, r *http.Request) {
-		request:=extractCreateRequest(w,r)
+		request := extractCreateRequest(w, r)
 		sendResponse(w, service.createShortUrl(request))
 	})
 	router.HandlerFunc(http.MethodGet, "/get", func(w http.ResponseWriter, r *http.Request) {
-		request:=extractGetRequest(w,r)
+		request := extractGetRequest(w, r)
 		sendResponse(w, service.getFullUrl(request))
 	})
 	return router
@@ -28,7 +29,11 @@ func extractCreateRequest(w http.ResponseWriter, r *http.Request) CreateShortUrl
 	if err != nil {
 		http.Error(w, "Error reading request body", http.StatusInternalServerError)
 	}
+
 	json.Unmarshal([]byte(body), &request)
+	fmt.Println(json.Marshal(request))
+	requestString, err := json.Marshal(request)
+	fmt.Println("Request extractCreateRequest : ",string(requestString))
 	return request
 }
 
@@ -39,6 +44,8 @@ func extractGetRequest(w http.ResponseWriter, r *http.Request) GetOriginalUrlReq
 		http.Error(w, "Error reading request body", http.StatusInternalServerError)
 	}
 	json.Unmarshal([]byte(body), &request)
+	requestString, err := json.Marshal(request)
+	fmt.Println("Request extractGetRequest: ",string(requestString))
 	return request
 }
 

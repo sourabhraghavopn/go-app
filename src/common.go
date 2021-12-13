@@ -15,5 +15,5 @@ func extractId(url string) (int, error) {
 		}
 		return id, nil
 	}
-	return 0, errors.New("incorrect url")
+	return 0, errors.New("Incorrect url")
 }

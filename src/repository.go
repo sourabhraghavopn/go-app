@@ -4,7 +4,7 @@ import (
 	"net/http"
 )
 
-func (repo UrlRepo) getLatestSequence() int {
+func (repo UrlRepoImpl) getLatestSequence() int {
 	conn, err := repo.conn.db.Conn(repo.conn.ctx)
 	if err != nil {
 		repo.logger.Fatal("Error reading request body", http.StatusInternalServerError)
@@ -14,14 +14,14 @@ func (repo UrlRepo) getLatestSequence() int {
 	err = conn.QueryRowContext(repo.conn.ctx, "SELECT nextval('public.\"url_Id\"')").Scan(&UrlId)
 	return UrlId
 }
-func (repo UrlRepo) insert(url UrlDetail) bool {
+func (repo UrlRepoImpl) insert(url UrlDetail) bool {
 	repo.conn.db.NewInsert().
 		Model(&url).
 		Exec(repo.conn.ctx)
 	return true
 }
 
-func (repo UrlRepo) get(shortUrlId int) (UrlDetail, error) {
+func (repo UrlRepoImpl) get(shortUrlId int) (UrlDetail, error) {
 	url := new(UrlDetail)
 	if err := repo.conn.db.NewSelect().
 		Model(url).

@@ -16,23 +16,28 @@ func (app *App) loadConnection() Conn {
 	dbPort, exist := os.LookupEnv("DB_PORT")
 	dbPassword, exist := os.LookupEnv("DB_PASSWORD")
 	dbUserName, exist := os.LookupEnv("DB_USERNAME")
+
 	if !exist {
 		app.logger.Print("properties are missing")
+		panic("properties are missing")
 	}
+
 	dsn := fmt.Sprintf("postgres://%s:%s@localhost:%s/%s?sslmode=disable", dbUserName, dbPassword, dbPort, dbName)
 	db := bun.NewDB(
 		sql.OpenDB(
 			pgdriver.NewConnector(
 				pgdriver.WithDSN(dsn)),
-			),
-			pgdialect.New())
+		),
+		pgdialect.New())
 	db.AddQueryHook(
 		bundebug.NewQueryHook(
 			bundebug.WithVerbose(true),
 			bundebug.FromEnv("BUNDEBUG"),
 		))
+
 	return Conn{
 		ctx: context.Background(),
 		db:  db,
 	}
+
 }
