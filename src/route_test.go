@@ -63,7 +63,7 @@ func TestCreateShortUrl(t *testing.T) {
 }
 
 func TestGetShortUrl(t *testing.T) {
-	request, _ := http.NewRequest(http.MethodGet, "/get", strings.NewReader("{\n    \"short_url\": \"http://localhost:5432/70\"\n}"))
+	request, _ := http.NewRequest(http.MethodPost, "/get", strings.NewReader("{\n    \"short_url\": \"http://localhost:5432/70\"\n}"))
 	writer := httptest.NewRecorder()
 	router.ServeHTTP(writer, request)
 

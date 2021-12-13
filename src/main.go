@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	env "github.com/joho/godotenv"
+	"github.com/rs/cors"
 	"log"
 	"net/http"
 	"os"
@@ -17,9 +18,9 @@ func  (app App) loadEnv(path string) string {
 		app.logger.Fatal(err)
 	}
 	port:="8080"
-	env_port, exist := os.LookupEnv("PORT")
+	definedPort, exist := os.LookupEnv("PORT")
 	if exist {
-		port=env_port
+		port= definedPort
 	}else{
 		app.logger.Print("Default  ")
 	}
@@ -34,11 +35,14 @@ func  main() {
 		logger:logger,
 	}
 	address:=app.loadEnv("resources/.env-dev")
+	handler := cors.New(cors.Options{
+		AllowedOrigins: []string{"http://localhost:3000"},
+	}).Handler(app.route(UrlRepoImpl{
+		conn: app.loadConnection(),
+		logger: logger}))
 	serve:=&http.Server{
 		Addr:address,
-		Handler:app.route(UrlRepoImpl{
-			conn: app.loadConnection(),
-			logger: logger}),
+		Handler:handler,
 		ReadTimeout: 10*time.Second,
 		WriteTimeout: 30*time.Second,
 	}

@@ -7,7 +7,7 @@ import (
 func (repo UrlRepoImpl) getLatestSequence() int {
 	conn, err := repo.conn.db.Conn(repo.conn.ctx)
 	if err != nil {
-		repo.logger.Fatal("Error reading request body", http.StatusInternalServerError)
+		repo.logger.Fatal("Error in connection with db", http.StatusInternalServerError)
 	}
 	defer conn.Close()
 	var UrlId int
@@ -27,7 +27,7 @@ func (repo UrlRepoImpl) get(shortUrlId int) (UrlDetail, error) {
 		Model(url).
 		Where("id = ?", shortUrlId).
 		Scan(repo.conn.ctx); err != nil {
-		repo.logger.Print(err)
+		repo.logger.Println(err)
 		return UrlDetail{}, err
 	}
 	return *url , nil
