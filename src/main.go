@@ -10,43 +10,42 @@ import (
 	"time"
 )
 
-
-
-func  (app App) loadEnv(path string) string {
+func (app App) loadEnv(path string) string {
 	err := env.Load(path)
 	if err != nil {
 		app.logger.Fatal(err)
 	}
-	port:="8080"
+	port := "8080"
 	definedPort, exist := os.LookupEnv("PORT")
 	if exist {
-		port= definedPort
-	}else{
+		port = definedPort
+	} else {
 		app.logger.Print("Default  ")
 	}
-	app.logger.Printf("port : %s ",port)
-	return  fmt.Sprintf(":%s", port)
+	app.logger.Printf("port : %s ", port)
+	return fmt.Sprintf(":%s", port)
 }
 
-func  main() {
+func main() {
 	fmt.Println("Running")
-	logger:=log.New(os.Stdout,"",log.Ldate|log.Llongfile)
-	app:=&App{
-		logger:logger,
+	logger := log.New(os.Stdout, "", log.Ldate|log.Llongfile)
+	app := &App{
+		logger: logger,
 	}
-	address:=app.loadEnv("resources/.env-dev")
+	address := app.loadEnv("resources/.env-dev")
+	frontEndApp, _ := os.LookupEnv("FE_APP")
 	handler := cors.New(cors.Options{
-		AllowedOrigins: []string{"http://localhost:3000"},
+		AllowedOrigins: []string{frontEndApp},
 	}).Handler(app.route(UrlRepoImpl{
-		conn: app.loadConnection(),
+		conn:   app.loadConnection(),
 		logger: logger}))
-	serve:=&http.Server{
-		Addr:address,
-		Handler:handler,
-		ReadTimeout: 10*time.Second,
-		WriteTimeout: 30*time.Second,
+	serve := &http.Server{
+		Addr:         address,
+		Handler:      handler,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 30 * time.Second,
 	}
-	err:=serve.ListenAndServe()
+	err := serve.ListenAndServe()
 	if err != nil {
 		app.logger.Fatal(err)
 	}
