@@ -37,8 +37,11 @@ func (service Service) getFullUrl(request GetOriginalUrlRequest) GetOriginalUrlR
 func extractId(url string) (int, error) {
 	list := strings.Split(url, "/")
 	if len(list) > 3 {
-		id_int, _ := strconv.Atoi(list[3])
-		return id_int, nil
+		id, err := strconv.Atoi(list[3])
+		if err!=nil {
+			return 0,nil
+		}
+		return id, nil
 	}
 	return 0, errors.New("incorrect url")
 }

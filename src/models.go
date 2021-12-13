@@ -6,6 +6,11 @@ import (
 	"log"
 )
 
+
+type App struct {
+	logger *log.Logger
+	conn   Conn
+}
 type UrlDetail struct {
 	Id          int
 	OriginalUrl string
@@ -14,10 +19,6 @@ type UrlDetail struct {
 type Conn struct {
 	db  *bun.DB
 	ctx context.Context
-}
-type App struct {
-	logger *log.Logger
-	conn   Conn
 }
 type UrlRepo struct {
 	logger *log.Logger

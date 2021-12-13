@@ -20,9 +20,12 @@ func (app *App) loadConnection() Conn {
 		app.logger.Print("properties are missing")
 	}
 	dsn := fmt.Sprintf("postgres://%s:%s@localhost:%s/%s?sslmode=disable", dbUserName, dbPassword, dbPort, dbName)
-	app.logger.Printf(dsn)
-	pgdb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(dsn)))
-	db := bun.NewDB(pgdb, pgdialect.New())
+	db := bun.NewDB(
+		sql.OpenDB(
+			pgdriver.NewConnector(
+				pgdriver.WithDSN(dsn)),
+			),
+			pgdialect.New())
 	db.AddQueryHook(
 		bundebug.NewQueryHook(
 			bundebug.WithVerbose(true),
