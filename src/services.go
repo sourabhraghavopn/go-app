@@ -12,7 +12,7 @@ func (service Service) createShortUrl(request CreateShortUrlRequest) CreateShort
 		OriginalUrl: string(request.OriginalUrl),
 		ShortUrl:    UrlId,
 	})
-	dbPort, exist := os.LookupEnv("DB_PORT")
+	dbPort, exist := os.LookupEnv("PORT")
 	if !exist || !done {
 		service.logger.Print("Properties are missing ")
 		return CreateShortUrlResponse{"", "failed"}
@@ -22,7 +22,6 @@ func (service Service) createShortUrl(request CreateShortUrlRequest) CreateShort
 func (service Service) getFullUrl(request GetOriginalUrlRequest) GetOriginalUrlResponse {
 	id, err := extractId(request.ShortUrl)
 	url, err := service.repo.get(id)
-	fmt.Println("Url ",url,err)
 	if err != nil {
 		service.logger.Print("Error found ", err)
 		return GetOriginalUrlResponse{"", "failed"}

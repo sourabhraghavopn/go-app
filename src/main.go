@@ -34,11 +34,13 @@ func main() {
 	}
 	address := app.loadEnv("resources/.env-dev")
 	frontEndApp, _ := os.LookupEnv("FE_APP")
+	repo:=UrlRepoImpl{
+		conn:   app.loadDataSource(),
+		logger: logger}
+	repo.init()
 	handler := cors.New(cors.Options{
 		AllowedOrigins: []string{frontEndApp},
-	}).Handler(app.route(UrlRepoImpl{
-		conn:   app.loadConnection(),
-		logger: logger}))
+	}).Handler(app.route(repo))
 	serve := &http.Server{
 		Addr:         address,
 		Handler:      handler,

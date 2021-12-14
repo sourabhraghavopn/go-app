@@ -18,9 +18,9 @@ type MockUrlRepo struct {
 	conn   Conn
 }
 
-func (repo MockUrlRepo) getLatestSequence() int                { return 0 }
+func (repo MockUrlRepo) getLatestSequence() int                { return 99 }
 func (repo MockUrlRepo) insert(url UrlDetail) bool             { return true }
-func (repo MockUrlRepo) get(shortUrlId int) (UrlDetail, error) { return UrlDetail{}, nil }
+func (repo MockUrlRepo) get(shortUrlId int) (UrlDetail, error) { return UrlDetail{OriginalUrl:"mocked_original_url"}, nil }
 var (
 	app = &App{
 		logger: log.New(os.Stdout, "", log.Ldate|log.Llongfile),
@@ -60,6 +60,9 @@ func TestCreateShortUrl(t *testing.T) {
 	if !strings.Contains(string(data), "\"status\":\"success\"") {
 		t.Errorf("Expected status:success %v", string(data))
 	}
+	if !strings.Contains(string(data), "/99") {
+		t.Errorf("Expected http://localhost:5432/99 but got %v", string(data))
+	}
 }
 
 func TestGetShortUrl(t *testing.T) {
@@ -76,8 +79,11 @@ func TestGetShortUrl(t *testing.T) {
 	if err != nil {
 		t.Errorf("expected error to be nil got %v", err)
 	}
-	fmt.Println(string(data))
 	if !strings.Contains(string(data), "\"status\":\"success\"") {
 		t.Errorf("Expected status:success %v", string(data))
 	}
+	if !strings.Contains(string(data), "mocked_original_url") {
+		t.Errorf("Expected original url mocked_original_url but got %v", string(data))
+	}
+
 }
