@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  backend-app:
+        build: .
+        image: go-app:latest
+        ports:
+          - 8080:8080
+        environment:
+          - PORT=8080
