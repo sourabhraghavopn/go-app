@@ -37,7 +37,7 @@ func (repo UrlRepoImpl) get(shortUrlId int) (UrlDetail, error) {
 func (repo *UrlRepoImpl) init() (sql.Result, error) {
 	conn, err := repo.conn.db.Conn(repo.conn.ctx)
 	if err != nil {
-		repo.logger.Fatal("Error in connection with db", http.StatusInternalServerError)
+		repo.logger.Fatal("Error in connection with db ", err)
 	}
 	defer conn.Close()
 	conn.ExecContext(repo.conn.ctx, "CREATE SEQUENCE IF NOT EXISTS url_Id")
